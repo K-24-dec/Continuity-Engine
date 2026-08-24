@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Continuity Engine - Multi-Tier Healthcare Continuity Platform (SIH26133)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #FDFCF8;
+      --forest-green: #4A5D4E;
+      --forest-dark: #3C4C3F;
+      --sage-accent: #A3B18A;
+      --sand-border: #D8D5C3;
+      --sand-light: #EAE7DC;
+      --sand-bg: #F4F1EA;
+      --charcoal-text: #2C332B;
+      --muted-text: #5A6D5E;
+      --danger-red: #EF4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-cream);
+      color: var(--charcoal-text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Header */
+    header {
+      background-color: var(--forest-green);
+      color: #FDFCF8;
+      border-bottom: 1px solid var(--forest-dark);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .header-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+    }
+
+    .logo-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--sage-accent);
+      color: var(--charcoal-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.25rem;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #FDFCF8;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sih-pill {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: var(--sand-light);
+      color: var(--forest-green);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      border: 1px solid var(--sand-border);
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--sand-border);
+    }
+
+    /* Hero Section with Grandpa image background clearly visible */
+    main.hero-container {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      min-height: calc(100vh - 120px);
+      padding: 2rem 1.5rem;
+      overflow: hidden;
+    }
+
+    .hero-bg-img {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-image: url('./grandpa.jpg'), url('/grandpa.jpg');
+      background-size: cover;
+      background-position: right 5% center;
+    }
+
+    /* Subtle gradient purely on the left edge so grandpa's face & body are 100% visible */
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      background: linear-gradient(90deg, rgba(20,26,21,0.65) 0%, rgba(20,26,21,0.35) 28%, rgba(0,0,0,0) 50%);
+      pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+      .hero-overlay {
+        background: linear-gradient(180deg, rgba(20,26,21,0.2) 0%, rgba(20,26,21,0.7) 100%);
+      }
+    }
+
+    .hero-wrapper {
+      position: relative;
+      z-index: 20;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    /* Floating Transparent Side Action Panel */
+    .side-panel {
+      max-width: 420px;
+      width: 100%;
+      background: rgba(44, 51, 43, 0.60);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 1.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Buttons */
+    .cta-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: var(--sage-accent);
+      color: var(--charcoal-text);
+      font-weight: 800;
+      font-size: 1rem;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #8F9F75;
+    }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 0.875rem 1.5rem;
+      background: rgba(255, 255, 255, 0.10);
+      color: #FDFCF8;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.20);
+    }
+
+    /* Direct Role Buttons */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.625rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .role-btn {
+      padding: 0.75rem 0.5rem;
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      border-radius: 12px;
+      color: #FDFCF8;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s;
+      backdrop-filter: blur(4px);
+    }
+
+    .role-btn:hover {
+      background: var(--forest-green);
+      border-color: var(--sage-accent);
+      color: #FDFCF8;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--forest-dark);
+      color: var(--sand-border);
+      border-top: 1px solid #344237;
+      padding: 1rem 1.5rem;
+      font-size: 11px;
+    }
+
+    .footer-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .footer-container {
+        flex-direction: row;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Header -->
+  <header>
+    <div class="header-container">
+      <div class="brand-group">
+        <div class="logo-badge">CE</div>
+        <div>
+          <div class="brand-title">
+            Continuity Engine
+            <span class="sih-pill">SIH26133</span>
+          </div>
+          <div class="brand-sub">Multi-Tier Healthcare Continuity Platform</div>
+        </div>
+      </div>
+
+      <div>
+        <a href="tel:108" style="color:#FFF; background:var(--danger-red); padding:8px 14px; border-radius:12px; font-weight:700; font-size:12px; text-decoration:none;">
+          Call Helpline 108
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Main Hero with Grandpa Face & Body Fully Visible and Floating Side Action Panel -->
+  <main class="hero-container">
+    <div class="hero-bg-img"></div>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-wrapper">
+      <div class="side-panel">
+        <div class="cta-group">
+          <a href="/?role=asha" class="btn-primary">
+            <span>Access Healthcare Portal Now</span>
+            <span>→</span>
+          </a>
+
+          <a href="tel:108" class="btn-secondary">
+            <span>📞 Call Helpline (108)</span>
+          </a>
+        </div>
+
+        <div>
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--sand-light); margin-bottom:8px;">
+            Direct Role Launch:
+          </div>
+          <div class="role-grid">
+            <a href="/?role=asha" class="role-btn">ASHA Worklist</a>
+            <a href="/?role=doctor" class="role-btn">Doctor OPD</a>
+            <a href="/?role=district_admin" class="role-btn">District Admin</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 3. Footer -->
+  <footer>
+    <div class="footer-container">
+      <div>
+        <strong>Continuity Engine</strong> • Smart India Hackathon (SIH26133)
+      </div>
+      <div>
+        24x7 Emergency: <strong>108</strong> • ABDM FHIR Protocol &amp; DPDP Compliant
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

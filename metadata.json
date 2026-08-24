@@ -1,0 +1,12 @@
+{
+  "name": "Continuity Engine - SIH26133",
+  "description": "Rural & Underserved Healthcare Continuity Platform connecting Sub-Centres, PHCs, CHCs/Rural Hospitals, and District Hospitals.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
+
