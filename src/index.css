@@ -1,23 +1,175 @@
 @import "tailwindcss";
 
 @layer base {
-  :root {
+  :root,
+  [data-theme="sage"] {
     --bg-natural: #FDFCF8;
     --bg-natural-surface: #FFFFFF;
     --bg-natural-alt: #F5F5F0;
     --bg-natural-sand: #EAE7DC;
     --text-natural-dark: #2C332B;
     --text-natural-tan: #8C7851;
+    --text-subtle: #D8D5C3;
     --accent-sage: #4A5D4E;
+    --accent-sage-dark: #3C4C3F;
+    --accent-sage-deep: #344237;
+    --accent-sage-border: #5A6D5E;
     --accent-olive: #A3B18A;
     --border-natural: #D8D5C3;
+    --input-bg: #FFFFFF;
+  }
+
+  [data-theme="abdm"] {
+    --bg-natural: #F8FAFC;
+    --bg-natural-surface: #FFFFFF;
+    --bg-natural-alt: #F1F5F9;
+    --bg-natural-sand: #E0F2FE;
+    --text-natural-dark: #0F172A;
+    --text-natural-tan: #475569;
+    --text-subtle: #94A3B8;
+    --accent-sage: #1E3A8A;
+    --accent-sage-dark: #172554;
+    --accent-sage-deep: #0F172A;
+    --accent-sage-border: #2563EB;
+    --accent-olive: #0D9488;
+    --border-natural: #CBD5E1;
+    --input-bg: #FFFFFF;
+  }
+
+  [data-theme="terracotta"] {
+    --bg-natural: #FFFDF9;
+    --bg-natural-surface: #FFFFFF;
+    --bg-natural-alt: #FFF7ED;
+    --bg-natural-sand: #FFEDD5;
+    --text-natural-dark: #431407;
+    --text-natural-tan: #9A3412;
+    --text-subtle: #FDBA74;
+    --accent-sage: #9A3412;
+    --accent-sage-dark: #7C2D12;
+    --accent-sage-deep: #6C2710;
+    --accent-sage-border: #C2410C;
+    --accent-olive: #D97706;
+    --border-natural: #FED7AA;
+    --input-bg: #FFFFFF;
+  }
+
+  [data-theme="emerald"] {
+    --bg-natural: #F6FEF9;
+    --bg-natural-surface: #FFFFFF;
+    --bg-natural-alt: #ECFDF5;
+    --bg-natural-sand: #D1FAE5;
+    --text-natural-dark: #064E3B;
+    --text-natural-tan: #047857;
+    --text-subtle: #A7F3D0;
+    --accent-sage: #065F46;
+    --accent-sage-dark: #064E3B;
+    --accent-sage-deep: #022C22;
+    --accent-sage-border: #059669;
+    --accent-olive: #10B981;
+    --border-natural: #A7F3D0;
+    --input-bg: #FFFFFF;
+  }
+
+  [data-theme="midnight"] {
+    --bg-natural: #0B1120;
+    --bg-natural-surface: #131E32;
+    --bg-natural-alt: #1E293B;
+    --bg-natural-sand: #1E293B;
+    --text-natural-dark: #F1F5F9;
+    --text-natural-tan: #94A3B8;
+    --text-subtle: #64748B;
+    --accent-sage: #0F766E;
+    --accent-sage-dark: #0B1528;
+    --accent-sage-deep: #070D18;
+    --accent-sage-border: #1E293B;
+    --accent-olive: #38BDF8;
+    --border-natural: #334155;
+    --input-bg: #1E293B;
+  }
+
+  [data-theme="surya"] {
+    --bg-natural: #FFFFFF;
+    --bg-natural-surface: #FFFFFF;
+    --bg-natural-alt: #F8FAFC;
+    --bg-natural-sand: #FEF3C7;
+    --text-natural-dark: #000000;
+    --text-natural-tan: #334155;
+    --text-subtle: #64748B;
+    --accent-sage: #0F172A;
+    --accent-sage-dark: #020617;
+    --accent-sage-deep: #000000;
+    --accent-sage-border: #334155;
+    --accent-olive: #D97706;
+    --border-natural: #94A3B8;
+    --input-bg: #FFFFFF;
+  }
+
+  [data-theme="lavender"] {
+    --bg-natural: #FAF7FD;
+    --bg-natural-surface: #FFFFFF;
+    --bg-natural-alt: #F3EBF9;
+    --bg-natural-sand: #EDE0F7;
+    --text-natural-dark: #2E1065;
+    --text-natural-tan: #6B21A8;
+    --text-subtle: #D8B4FE;
+    --accent-sage: #581C87;
+    --accent-sage-dark: #3B0764;
+    --accent-sage-deep: #2E1065;
+    --accent-sage-border: #7E22CE;
+    --accent-olive: #9333EA;
+    --border-natural: #D8B4FE;
+    --input-bg: #FFFFFF;
   }
 
   body {
-    background-color: #FDFCF8;
-    color: #2C332B;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--bg-natural);
+    color: var(--text-natural-dark);
+    font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', 'Noto Sans Telugu', 'Noto Sans Tamil', 'Noto Sans Bengali', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
+}
+
+/* Dynamic theme class overrides */
+[class*="bg-[#FDFCF8]"] { background-color: var(--bg-natural) !important; }
+[class*="bg-[#4A5D4E]"] { background-color: var(--accent-sage) !important; }
+[class*="bg-[#3C4C3F]"] { background-color: var(--accent-sage-dark) !important; }
+[class*="bg-[#344237]"] { background-color: var(--accent-sage-deep) !important; }
+[class*="bg-[#A3B18A]"] { background-color: var(--accent-olive) !important; }
+[class*="bg-[#EAE7DC]"] { background-color: var(--bg-natural-sand) !important; }
+[class*="bg-[#F5F5F0]"] { background-color: var(--bg-natural-alt) !important; }
+[class*="border-[#D8D5C3]"] { border-color: var(--border-natural) !important; }
+[class*="border-[#5A6D5E]"] { border-color: var(--accent-sage-border) !important; }
+[class*="border-[#3C4C3F]"] { border-color: var(--accent-sage-dark) !important; }
+[class*="border-[#344237]"] { border-color: var(--accent-sage-deep) !important; }
+[class*="text-[#2C332B]"] { color: var(--text-natural-dark) !important; }
+[class*="text-[#4A5D4E]"] { color: var(--accent-sage) !important; }
+[class*="text-[#8C7851]"] { color: var(--text-natural-tan) !important; }
+[class*="text-[#A3B18A]"] { color: var(--accent-olive) !important; }
+[class*="text-[#D8D5C3]"] { color: var(--text-subtle) !important; }
+[class*="hover:bg-[#3C4C3F]"]:hover { background-color: var(--accent-sage-dark) !important; }
+[class*="hover:bg-[#324035]"]:hover { background-color: var(--accent-sage-deep) !important; }
+[class*="hover:border-[#A3B18A]"]:hover { border-color: var(--accent-olive) !important; }
+
+/* Dark mode specific enhancements */
+[data-theme="midnight"] .bg-white {
+  background-color: var(--bg-natural-surface) !important;
+  color: var(--text-natural-dark) !important;
+  border-color: var(--border-natural) !important;
+}
+
+[data-theme="midnight"] input:not([type="checkbox"]):not([type="radio"]),
+[data-theme="midnight"] select,
+[data-theme="midnight"] textarea {
+  background-color: var(--input-bg) !important;
+  color: var(--text-natural-dark) !important;
+  border-color: var(--border-natural) !important;
+}
+
+[data-theme="midnight"] select option {
+  background-color: var(--bg-natural-surface);
+  color: var(--text-natural-dark);
 }
 
 /* Custom scrollbar and transition styling */
@@ -26,12 +178,12 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F5F5F0;
+  background: var(--bg-natural-alt);
 }
 ::-webkit-scrollbar-thumb {
-  background: #D8D5C3;
+  background: var(--border-natural);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #A3B18A;
+  background: var(--accent-olive);
 }

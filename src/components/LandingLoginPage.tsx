@@ -10,9 +10,9 @@ import {
   Stethoscope, 
   HeartHandshake, 
   Activity,
-  PhoneCall,
-  ShieldCheck
+  PhoneCall
 } from 'lucide-react';
+import { translations } from '../services/i18n';
 
 interface LandingLoginPageProps {
   onLogin: (role: UserRole, phone?: string) => void;
@@ -33,10 +33,12 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
   const [loginError, setLoginError] = useState('');
   const [isSendingOtp, setIsSendingOtp] = useState(false);
 
+  const t = translations[currentLang] || translations.en;
+
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone || phone.length < 10) {
-      setLoginError('Please enter a valid 10-digit mobile number.');
+      setLoginError(t.invalidPhoneErr);
       return;
     }
     setIsSendingOtp(true);
@@ -51,7 +53,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
   const handleVerifyLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!otp || otp.length < 4) {
-      setLoginError('Please enter the 4-digit verification code.');
+      setLoginError(t.invalidOtpErr);
       return;
     }
     onLogin(selectedRole, `+91 ${phone}`);
@@ -70,19 +72,19 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
           {/* Logo & Brand Header */}
           <div className="flex items-center space-x-3.5">
             <div className="w-10 h-10 rounded-xl bg-[#A3B18A] text-[#2C332B] flex items-center justify-center font-black tracking-wider text-xl shadow-xs">
-              CE
+              AS
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <span className="font-bold text-lg sm:text-xl text-[#FDFCF8] tracking-tight">
-                  Continuity Engine
+                  {t.appName}
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-widest bg-[#EAE7DC] text-[#4A5D4E] px-2 py-0.5 rounded-full border border-[#D8D5C3]">
-                  SIH26133
+                  {t.abdmConnectedPill}
                 </span>
               </div>
               <p className="text-[11px] text-[#D8D5C3] hidden sm:block">
-                Multi-Tier Healthcare Continuity Platform
+                {t.tagline}
               </p>
             </div>
           </div>
@@ -108,7 +110,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
               className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold shadow-xs transition-transform active:scale-95"
             >
               <PhoneCall className="w-3.5 h-3.5" />
-              <span>Call Helpline 108</span>
+              <span>{t.callHelpline}</span>
             </a>
           </div>
         </div>
@@ -151,7 +153,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                 onClick={() => setIsModalOpen(true)}
                 className="w-full py-4 px-6 bg-[#A3B18A] hover:bg-[#8F9F75] active:scale-98 text-[#2C332B] font-extrabold text-base rounded-2xl transition-all shadow-xl shadow-black/25 flex items-center justify-center gap-2 group cursor-pointer"
               >
-                <span>Access Healthcare Portal Now</span>
+                <span>{t.accessPortalNow}</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-[#2C332B]" />
               </button>
 
@@ -161,14 +163,14 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                 className="w-full py-3.5 px-6 bg-white/10 hover:bg-white/20 text-[#FDFCF8] border border-white/25 backdrop-blur-xs font-bold text-sm rounded-2xl transition-all flex items-center justify-center gap-2 shadow-xs text-center cursor-pointer"
               >
                 <PhoneCall className="w-4 h-4 text-[#EF4444]" />
-                <span>Call Helpline (108)</span>
+                <span>{t.callHelpline}</span>
               </a>
             </div>
 
             {/* Direct Role Launch */}
             <div className="pt-4 border-t border-white/15 space-y-2.5">
               <p className="text-[11px] font-bold text-[#EAE7DC] uppercase tracking-wider">
-                Direct Role Launch:
+                {t.directRoleLaunch}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <button
@@ -177,7 +179,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                   className="p-3 rounded-xl bg-white/10 hover:bg-[#4A5D4E] hover:border-[#A3B18A] text-[#FDFCF8] text-xs font-bold border border-white/20 backdrop-blur-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <UserCheck className="w-4 h-4 text-[#A3B18A]" />
-                  <span>ASHA Worklist</span>
+                  <span>{t.ashaWorklistBtn}</span>
                 </button>
 
                 <button
@@ -186,7 +188,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                   className="p-3 rounded-xl bg-white/10 hover:bg-[#4A5D4E] hover:border-[#A3B18A] text-[#FDFCF8] text-xs font-bold border border-white/20 backdrop-blur-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <Stethoscope className="w-4 h-4 text-[#A3B18A]" />
-                  <span>Doctor OPD</span>
+                  <span>{t.doctorOpdBtn}</span>
                 </button>
 
                 <button
@@ -195,7 +197,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                   className="p-3 rounded-xl bg-white/10 hover:bg-[#4A5D4E] hover:border-[#A3B18A] text-[#FDFCF8] text-xs font-bold border border-white/20 backdrop-blur-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <Activity className="w-4 h-4 text-[#A3B18A]" />
-                  <span>District Admin</span>
+                  <span>{t.districtAdminBtn}</span>
                 </button>
               </div>
             </div>
@@ -208,14 +210,14 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
       <footer className="bg-[#3C4C3F] text-[#D8D5C3] border-t border-[#344237] py-4 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-[#FDFCF8]">Continuity Engine</span>
+            <span className="font-bold text-[#FDFCF8]">{t.appName}</span>
             <span>•</span>
-            <span>Smart India Hackathon (SIH26133)</span>
+            <span>{t.abdmConnectedPill}</span>
           </div>
           <div className="flex items-center gap-4 text-[11px]">
-            <span>24x7 Emergency: <strong>108</strong></span>
+            <span>24x7: <strong>108</strong></span>
             <span>•</span>
-            <span>ABDM FHIR Protocol &amp; DPDP Compliant</span>
+            <span>{t.abdmPill} &amp; {t.dpdpPill}</span>
           </div>
         </div>
       </footer>
@@ -235,10 +237,10 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-[#FDFCF8]">
-                    Portal Verification
+                    {t.portalVerification}
                   </h3>
                   <p className="text-[11px] text-[#D8D5C3]">
-                    Instant access for frontline staff &amp; administrators
+                    {t.portalVerificationSub}
                   </p>
                 </div>
               </div>
@@ -264,7 +266,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                 <form onSubmit={handleSendOtp} className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-[#4A5D4E] mb-1.5">
-                      Enter Mobile Number:
+                      {t.enterMobileNum}
                     </label>
                     <div className="flex rounded-xl overflow-hidden border border-[#D8D5C3] bg-white focus-within:border-[#4A5D4E] focus-within:ring-1 focus-within:ring-[#4A5D4E]">
                       <span className="bg-[#EAE7DC] px-3.5 py-3 text-[#4A5D4E] font-mono font-bold flex items-center border-r border-[#D8D5C3]">
@@ -285,14 +287,14 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
 
                   <div>
                     <label className="block text-xs font-bold text-[#4A5D4E] mb-1.5">
-                      Select Access Workspace:
+                      {t.selectWorkspace}
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        { id: 'asha', label: 'ASHA Worker', icon: UserCheck, desc: 'Village Worklist' },
-                        { id: 'doctor', label: 'Medical Officer', icon: Stethoscope, desc: 'PHC Tele-OPD' },
-                        { id: 'patient', label: 'Citizen / Elder', icon: HeartHandshake, desc: 'My Health Card' },
-                        { id: 'district_admin', label: 'District Admin', icon: Activity, desc: 'Leakage Analytics' }
+                        { id: 'asha', label: t.rolePatientAsha, icon: UserCheck, desc: t.ashaWorklistDesc },
+                        { id: 'doctor', label: t.roleDoctor, icon: Stethoscope, desc: t.doctorOpdDesc },
+                        { id: 'patient', label: t.roleCitizenElder, icon: HeartHandshake, desc: t.citizenHealthDesc },
+                        { id: 'district_admin', label: t.roleAdmin, icon: Activity, desc: t.districtAdminDesc }
                       ].map(item => (
                         <button
                           type="button"
@@ -320,7 +322,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                     className="w-full py-3.5 bg-[#4A5D4E] hover:bg-[#3C4C3F] text-[#FDFCF8] font-bold text-sm rounded-xl transition-all shadow-md shadow-[#4A5D4E]/20 flex items-center justify-center gap-2"
                   >
                     <Lock className="w-4 h-4" />
-                    <span>{isSendingOtp ? 'Sending Code...' : 'Send Verification Code'}</span>
+                    <span>{isSendingOtp ? t.sendingCode : t.sendVerificationCode}</span>
                   </button>
                 </form>
               ) : (
@@ -328,16 +330,16 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                 <form onSubmit={handleVerifyLogin} className="space-y-4">
                   <div className="p-3 bg-[#EAE7DC] rounded-xl border border-[#D8D5C3] text-center space-y-1">
                     <p className="text-[11px] text-[#4A5D4E]">
-                      Code sent to <strong className="text-[#2C332B]">+91 {phone}</strong>
+                      {t.codeSentTo} <strong className="text-[#2C332B]">+91 {phone}</strong>
                     </p>
                     <p className="text-[10px] text-[#4A5D4E] font-bold">
-                      (Demo mode: auto-filled with <code className="bg-white px-1.5 py-0.5 rounded border border-[#D8D5C3]">4492</code>)
+                      ({t.demoModeNote})
                     </p>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-[#4A5D4E] mb-1.5 text-center">
-                      Enter 4-Digit Code:
+                      {t.enter4DigitCode}
                     </label>
                     <input
                       type="text"
@@ -356,7 +358,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                     className="w-full py-3.5 bg-[#4A5D4E] hover:bg-[#3C4C3F] text-[#FDFCF8] font-bold text-sm rounded-xl transition-all shadow-md shadow-[#4A5D4E]/20 flex items-center justify-center gap-2"
                   >
                     <CheckCircle2 className="w-4 h-4 text-[#A3B18A]" />
-                    <span>Verify &amp; Enter Portal</span>
+                    <span>{t.verifyEnterPortal}</span>
                   </button>
 
                   <button
@@ -364,7 +366,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({
                     onClick={() => setOtpSent(false)}
                     className="w-full text-center text-xs text-[#5A6D5E] hover:text-[#4A5D4E] underline py-1"
                   >
-                    Change Phone Number
+                    {t.changePhone}
                   </button>
                 </form>
               )}

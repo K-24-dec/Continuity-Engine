@@ -2,16 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { WifiOff, RefreshCw, CheckCircle2, ArrowRight } from 'lucide-react';
 import { isOffline, syncPendingQueue } from '../services/api';
 import { getPendingQueue } from '../services/db';
+import { SupportedLanguage } from '../types';
+import { translations } from '../services/i18n';
 
 interface OfflineSyncBannerProps {
+  currentLang?: SupportedLanguage;
   onSyncComplete?: () => void;
 }
 
-export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onSyncComplete }) => {
+export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ currentLang = 'en', onSyncComplete }) => {
   const [offline, setOffline] = useState(isOffline());
   const [pendingItems, setPendingItems] = useState<any[]>([]);
   const [syncing, setSyncing] = useState(false);
   const [lastSyncSuccess, setLastSyncSuccess] = useState<number | null>(null);
+
+  const t = translations[currentLang] || translations.en;
 
   const refreshState = async () => {
     setOffline(isOffline());
@@ -65,21 +70,21 @@ export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onSyncComp
               <div className="w-2.5 h-2.5 rounded-full bg-[#8C7851] animate-ping" />
               <span className="font-bold text-[#8C7851] flex items-center gap-1.5 uppercase tracking-wide">
                 <WifiOff className="w-3.5 h-3.5" />
-                Offline Mode (PWA Edge Architecture)
+                {t.offlineMode}
               </span>
               <span className="text-[#2C332B]/80 hidden sm:inline">
-                All patient registrations, vitals & referrals are securely saved in local IndexedDB.
+                {t.offlineBannerDesc}
               </span>
             </>
           ) : (
             <>
               <CheckCircle2 className="w-4 h-4 text-[#4A5D4E]" />
               <span className="font-bold text-[#4A5D4E] uppercase tracking-wide">
-                Network Connected
+                {t.onlineMode}
               </span>
               {pendingItems.length > 0 && (
                 <span className="text-[#2C332B]/90 font-medium">
-                  — {pendingItems.length} changes waiting for background sync.
+                  — {pendingItems.length} {t.pendingSyncMsg}
                 </span>
               )}
             </>
@@ -90,7 +95,7 @@ export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onSyncComp
           {lastSyncSuccess !== null && (
             <span className="text-[#4A5D4E] font-bold flex items-center gap-1 animate-fadeIn bg-white px-2.5 py-0.5 rounded-full border border-[#D8D5C3]">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              Synced {lastSyncSuccess} records to cloud
+              {t.syncedSuccessMsg} ({lastSyncSuccess})
             </span>
           )}
 
@@ -106,7 +111,7 @@ export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onSyncComp
               }`}
             >
               <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
-              <span>{syncing ? 'Syncing...' : `Sync ${pendingItems.length} Records`}</span>
+              <span>{syncing ? t.syncing : `${t.syncQueue} (${pendingItems.length})`}</span>
               {!offline && <ArrowRight className="w-3 h-3 ml-0.5" />}
             </button>
           )}

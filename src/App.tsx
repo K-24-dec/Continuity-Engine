@@ -23,6 +23,7 @@ import {
   fetchHighRiskFlags,
   isOffline
 } from './services/api';
+import { translations } from './services/i18n';
 
 export default function App() {
   const [showLanding, setShowLanding] = useState(() => {
@@ -47,6 +48,15 @@ export default function App() {
 
   const [currentLang, setCurrentLang] = useState<SupportedLanguage>('en');
   const [currentUserPhone, setCurrentUserPhone] = useState<string | null>(null);
+
+  // Sync document lang attribute
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = currentLang;
+    }
+  }, [currentLang]);
+
+  const t = translations[currentLang] || translations.en;
 
   // Shared Core Data Collections
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -135,7 +145,7 @@ export default function App() {
       />
 
       {/* Offline Status & IndexedDB Queue Banner */}
-      <OfflineSyncBanner onSyncComplete={loadAllData} />
+      <OfflineSyncBanner currentLang={currentLang} onSyncComplete={loadAllData} />
 
       {/* Main Role-Specific Workspace Canvas */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6">
@@ -143,7 +153,7 @@ export default function App() {
           <div className="flex items-center justify-center h-64 text-[#8C7851] text-xs">
             <div className="flex flex-col items-center space-y-2">
               <div className="w-6 h-6 border-2 border-[#4A5D4E] border-t-transparent rounded-full animate-spin" />
-              <span>Loading Continuity Engine workspace...</span>
+              <span>{t.loading}</span>
             </div>
           </div>
         ) : (
@@ -156,6 +166,7 @@ export default function App() {
                 referrals={referrals}
                 highRiskFlags={highRiskFlags}
                 currentLang={currentLang}
+                currentRole={currentRole}
                 onRefreshData={loadAllData}
                 onOpenTeleconsult={handleOpenTeleconsult}
                 onTriggerSOS={() => setIsSosOpen(true)}
@@ -195,6 +206,7 @@ export default function App() {
         onClose={() => setIsSosOpen(false)}
         patients={patients}
         facilities={facilities}
+        currentLang={currentLang}
         onEscalated={loadAllData}
       />
 
@@ -204,24 +216,26 @@ export default function App() {
         onClose={() => setTeleconsultState({ isOpen: false })}
         customRoomId={teleconsultState.roomId}
         patientName={teleconsultState.patientName}
+        currentLang={currentLang}
       />
 
       {/* Global SMS / USSD Fallback Simulator */}
       <SmsSimulatorModal
         isOpen={isSmsSimOpen}
         onClose={() => setIsSmsSimOpen(false)}
+        currentLang={currentLang}
       />
 
       {/* Footer */}
       <footer className="bg-[#F5F5F0] border-t border-[#D8D5C3] py-3.5 px-4 text-center text-[#8C7851] text-[11px]">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <span>
-            Smart India Hackathon 2026 (SIH26133) • <strong className="text-[#4A5D4E]">Continuity Engine</strong>
+            {t.tagline} • <strong className="text-[#4A5D4E]">{t.appName}</strong>
           </span>
           <span className="flex items-center gap-2">
-            <span className="bg-[#EAE7DC] text-[#4A5D4E] font-medium px-2 py-0.5 rounded border border-[#D8D5C3]">ABDM FHIR Compatible</span>
-            <span className="bg-[#EAE7DC] text-[#4A5D4E] font-medium px-2 py-0.5 rounded border border-[#D8D5C3]">DPDP Act 2023 Compliant</span>
-            <span className="bg-[#EAE7DC] text-[#4A5D4E] font-medium px-2 py-0.5 rounded border border-[#D8D5C3]">Offline-First PWA</span>
+            <span className="bg-[#EAE7DC] text-[#4A5D4E] font-medium px-2 py-0.5 rounded border border-[#D8D5C3]">{t.abdmPill}</span>
+            <span className="bg-[#EAE7DC] text-[#4A5D4E] font-medium px-2 py-0.5 rounded border border-[#D8D5C3]">{t.dpdpPill}</span>
+            <span className="bg-[#EAE7DC] text-[#4A5D4E] font-medium px-2 py-0.5 rounded border border-[#D8D5C3]">{t.offlineMode}</span>
           </span>
         </div>
       </footer>

@@ -30,7 +30,8 @@ import {
   HighRiskFlag,
   FacilityInventoryItem,
   SupportedLanguage,
-  EncounterVitals
+  EncounterVitals,
+  UserRole
 } from '../../types';
 import {
   registerPatient,
@@ -42,6 +43,8 @@ import {
   fetchInventory
 } from '../../services/api';
 import { translations, speakText } from '../../services/i18n';
+import { MedicationReminderView } from '../MedicationReminderView';
+import { Pill } from 'lucide-react';
 
 interface PatientAshaViewProps {
   patients: Patient[];
@@ -49,6 +52,7 @@ interface PatientAshaViewProps {
   referrals: ReferralThread[];
   highRiskFlags: HighRiskFlag[];
   currentLang: SupportedLanguage;
+  currentRole?: UserRole;
   onRefreshData: () => void;
   onOpenTeleconsult: (roomId: string, patientName: string) => void;
   onTriggerSOS: () => void;
@@ -60,11 +64,20 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
   referrals,
   highRiskFlags,
   currentLang,
+  currentRole = 'asha',
   onRefreshData,
   onOpenTeleconsult,
   onTriggerSOS
 }) => {
-  const [activeTab, setActiveTab] = useState<'worklist' | 'referrals' | 'register' | 'triage' | 'inventory'>('worklist');
+  const safePatients = patients || [];
+  const safeFacilities = facilities || [];
+  const safeReferrals = referrals || [];
+  const safeHighRiskFlags = highRiskFlags || [];
+
+  const [activeTab, setActiveTab] = useState<'worklist' | 'referrals' | 'register' | 'triage' | 'inventory' | 'medications'>(
+    currentRole === 'patient' ? 'medications' : 'worklist'
+  );
+  const [selectedMedPatientId, setSelectedMedPatientId] = useState<string>(safePatients[0]?.id || 'pat-001');
   const [searchQuery, setSearchQuery] = useState('');
   const t = translations[currentLang] || translations.en;
 
@@ -80,9 +93,9 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
   const [regSuccess, setRegSuccess] = useState<string | null>(null);
 
   // Referral Creation Form State
-  const [refPatientId, setRefPatientId] = useState(patients[0]?.id || '');
-  const [refFromFac, setRefFromFac] = useState(facilities[0]?.id || '');
-  const [refToFac, setRefToFac] = useState(facilities[2]?.id || facilities[1]?.id || '');
+  const [refPatientId, setRefPatientId] = useState(safePatients[0]?.id || '');
+  const [refFromFac, setRefFromFac] = useState(safeFacilities[0]?.id || '');
+  const [refToFac, setRefToFac] = useState(safeFacilities[2]?.id || safeFacilities[1]?.id || '');
   const [refReason, setRefReason] = useState('');
   const [refClinicalSummary, setRefClinicalSummary] = useState('');
   const [refUrgency, setRefUrgency] = useState<'routine' | 'urgent' | 'emergency'>('urgent');
@@ -111,10 +124,10 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
 
   // Inventory View State
   const [inventoryList, setInventoryList] = useState<FacilityInventoryItem[]>([]);
-  const [selectedInvFac, setSelectedInvFac] = useState(facilities[0]?.id || '');
+  const [selectedInvFac, setSelectedInvFac] = useState(safeFacilities[0]?.id || '');
 
   useEffect(() => {
-    fetchInventory().then(items => setInventoryList(items));
+    fetchInventory().then(items => setInventoryList(Array.isArray(items) ? items : []));
   }, []);
 
   // Web Speech Recognition for local language input
@@ -338,6 +351,22 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
         </button>
 
         <button
+          id="tab-medications"
+          onClick={() => setActiveTab('medications')}
+          className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'medications'
+              ? 'bg-[#4A5D4E] text-white shadow-xs'
+              : 'text-[#2C332B] hover:bg-[#D8D5C3]/70'
+          }`}
+        >
+          <Pill className="w-3.5 h-3.5" />
+          <span>Medication Reminders</span>
+          <span className="bg-[#8C7851] text-white text-[9px] px-1.5 py-0.2 rounded-full font-bold ml-1">
+            Dose Tracker
+          </span>
+        </button>
+
+        <button
           id="tab-inventory"
           onClick={() => setActiveTab('inventory')}
           className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
@@ -351,6 +380,17 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
         </button>
       </div>
 
+      {/* TAB: MEDICATION REMINDERS & DAILY DOSE TRACKER */}
+      {activeTab === 'medications' && (
+        <MedicationReminderView
+          patients={safePatients}
+          selectedPatientId={selectedMedPatientId}
+          onPatientSelect={(id) => setSelectedMedPatientId(id)}
+          currentRole={currentRole}
+          currentLang={currentLang}
+        />
+      )}
+
       {/* TAB 1: PROACTIVE HIGH-RISK FOLLOW-UP WORKLIST (Tier 1 #3) */}
       {activeTab === 'worklist' && (
         <div className="space-y-4">
@@ -362,14 +402,14 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
             <div>
               <h4 className="font-bold text-sm text-[#EAE7DC]">Proactive Automated Worklist</h4>
               <p className="text-[#FDFCF8] text-[11px] leading-relaxed mt-1">
-                The Continuity Engine automatically tracks maternal pregnancy milestones, child SAM malnutrition criteria, and chronic disease intervals based on <code className="bg-black/30 px-1.5 py-0.5 rounded text-[#EAE7DC]">next_due_date</code>. Past-due records automatically populate this worklist without manual intervention.
+                AarogyaSamaj automatically tracks maternal pregnancy milestones, child SAM malnutrition criteria, and chronic disease intervals based on <code className="bg-black/30 px-1.5 py-0.5 rounded text-[#EAE7DC]">next_due_date</code>. Past-due records automatically populate this worklist without manual intervention.
               </p>
             </div>
           </div>
 
           {/* High-Risk Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {highRiskFlags.map(flag => {
+            {safeHighRiskFlags.map(flag => {
               const isOverdue = flag.status === 'overdue';
               return (
                 <div
@@ -471,7 +511,7 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
                   onChange={(e) => setRefPatientId(e.target.value)}
                   className="w-full bg-[#F5F5F0] border border-[#D8D5C3] rounded-xl p-2.5 text-[#2C332B] font-medium"
                 >
-                  {patients.map(p => (
+                  {safePatients.map(p => (
                     <option key={p.id} value={p.id}>
                       {p.name} ({p.village})
                     </option>
@@ -486,9 +526,9 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
                   onChange={(e) => setRefFromFac(e.target.value)}
                   className="w-full bg-[#F5F5F0] border border-[#D8D5C3] rounded-xl p-2.5 text-[#2C332B] font-medium"
                 >
-                  {facilities.map(f => (
+                  {safeFacilities.map(f => (
                     <option key={f.id} value={f.id}>
-                      [{f.type.toUpperCase()}] {f.name}
+                      [{f.type?.toUpperCase()}] {f.name}
                     </option>
                   ))}
                 </select>
@@ -501,9 +541,9 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
                   onChange={(e) => setRefToFac(e.target.value)}
                   className="w-full bg-[#F5F5F0] border border-[#D8D5C3] rounded-xl p-2.5 text-[#2C332B] font-medium"
                 >
-                  {facilities.map(f => (
+                  {safeFacilities.map(f => (
                     <option key={f.id} value={f.id}>
-                      [{f.type.toUpperCase()}] {f.name}
+                      [{f.type?.toUpperCase()}] {f.name}
                     </option>
                   ))}
                 </select>
@@ -549,13 +589,13 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
           {/* Active Referral List & Leakage Tracker */}
           <div className="space-y-3">
             <h4 className="font-bold text-xs text-[#8C7851] uppercase tracking-wider">
-              Active Referral Threads ({referrals.length})
+              Active Referral Threads ({safeReferrals.length})
             </h4>
 
-            {referrals.map(ref => {
+            {safeReferrals.map(ref => {
               const isLost = ref.status === 'lost' || ref.is_leaking;
-              const fromFac = facilities.find(f => f.id === ref.from_facility_id);
-              const toFac = facilities.find(f => f.id === ref.to_facility_id);
+              const fromFac = safeFacilities.find(f => f.id === ref.from_facility_id);
+              const toFac = safeFacilities.find(f => f.id === ref.to_facility_id);
 
               return (
                 <div
@@ -598,7 +638,7 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
                             ? 'bg-[#EAE7DC] text-[#4A5D4E] border-[#D8D5C3]'
                             : 'bg-[#F5F5F0] text-[#2C332B] border-[#D8D5C3]'
                         }`}>
-                          Status: {ref.status.replace('_', ' ')}
+                          Status: {ref.status?.replace('_', ' ')}
                         </span>
                       )}
                     </div>
@@ -651,7 +691,7 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
                   {/* Status History Logs */}
                   <div className="text-[11px] text-[#8C7851] border-t border-[#D8D5C3] pt-2 space-y-1">
                     <p className="font-bold text-[#4A5D4E]">Timeline Log:</p>
-                    {ref.status_history.map(log => (
+                    {(ref.status_history || []).map(log => (
                       <div key={log.id} className="flex justify-between">
                         <span>• {log.notes}</span>
                         <span>{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
@@ -950,9 +990,9 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
                 className="bg-[#F5F5F0] border border-[#D8D5C3] rounded-xl p-2.5 text-xs font-bold text-[#2C332B]"
               >
                 <option value="">-- All Facility Tiers --</option>
-                {facilities.map(f => (
+                {safeFacilities.map(f => (
                   <option key={f.id} value={f.id}>
-                    [{f.type.toUpperCase()}] {f.name}
+                    [{f.type?.toUpperCase()}] {f.name}
                   </option>
                 ))}
               </select>
@@ -971,15 +1011,15 @@ export const PatientAshaView: React.FC<PatientAshaViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#D8D5C3]">
-                  {inventoryList
+                  {(inventoryList || [])
                     .filter(i => !selectedInvFac || i.facility_id === selectedInvFac)
                     .map(item => {
-                      const fac = facilities.find(f => f.id === item.facility_id);
+                      const fac = safeFacilities.find(f => f.id === item.facility_id);
                       return (
                         <tr key={item.id} className="hover:bg-[#F5F5F0]/70">
                           <td className="p-3 font-medium text-[#2C332B]">
                             <span className="text-[10px] bg-[#EAE7DC] text-[#4A5D4E] font-bold px-2 py-0.5 rounded border border-[#D8D5C3] mr-1.5">
-                              {fac?.type.replace('_', ' ').toUpperCase()}
+                              {fac?.type?.replace('_', ' ').toUpperCase()}
                             </span>
                             {fac?.name}
                           </td>

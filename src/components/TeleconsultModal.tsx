@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Video, X, Maximize2, Mic, MicOff, VideoOff, PhoneOff, ExternalLink, ShieldCheck } from 'lucide-react';
-import { Appointment } from '../types';
+import { Appointment, SupportedLanguage } from '../types';
+import { translations } from '../services/i18n';
 
 interface TeleconsultModalProps {
   isOpen: boolean;
@@ -8,6 +9,7 @@ interface TeleconsultModalProps {
   appointment?: Appointment | null;
   customRoomId?: string;
   patientName?: string;
+  currentLang?: SupportedLanguage;
 }
 
 export const TeleconsultModal: React.FC<TeleconsultModalProps> = ({
@@ -15,15 +17,17 @@ export const TeleconsultModal: React.FC<TeleconsultModalProps> = ({
   onClose,
   appointment,
   customRoomId,
-  patientName
+  patientName,
+  currentLang = 'en'
 }) => {
+  const t = translations[currentLang] || translations.en;
   const [micMuted, setMicMuted] = useState(false);
   const [videoDisabled, setVideoDisabled] = useState(false);
 
   if (!isOpen) return null;
 
-  const roomId = customRoomId || appointment?.video_room_id || `sih26133-consult-${Date.now().toString().slice(-6)}`;
-  const titleName = patientName || appointment?.patient_name || 'Patient';
+  const roomId = customRoomId || appointment?.video_room_id || `aarogya-consult-${Date.now().toString().slice(-6)}`;
+  const titleName = patientName || appointment?.patient_name || t.patient;
   const jitsiUrl = `https://meet.jit.si/${roomId}#config.prejoinPageEnabled=false&config.startWithAudioMuted=${micMuted}&config.startWithVideoMuted=${videoDisabled}`;
 
   return (
@@ -37,7 +41,7 @@ export const TeleconsultModal: React.FC<TeleconsultModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-sm sm:text-base flex items-center gap-2 text-[#2C332B]">
-                Teleconsultation: {titleName}
+                {t.teleconsultRoom}: {titleName}
                 <span className="text-[10px] font-bold bg-[#4A5D4E] text-white px-2.5 py-0.5 rounded-full flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-white" />
                   Jitsi Encrypted Link
@@ -91,7 +95,7 @@ export const TeleconsultModal: React.FC<TeleconsultModalProps> = ({
             className="px-4 py-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-xs rounded-xl flex items-center gap-1.5 ml-auto shadow-xs"
           >
             <PhoneOff className="w-3.5 h-3.5" />
-            Disconnect Call
+            {t.disconnectCall}
           </button>
         </div>
       </div>

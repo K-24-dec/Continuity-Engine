@@ -1,5 +1,21 @@
 export type UserRole = 'patient' | 'asha' | 'doctor' | 'facility_admin' | 'district_admin';
 
+export type AppTheme = 'sage' | 'abdm' | 'terracotta' | 'emerald' | 'midnight' | 'surya' | 'lavender';
+
+export interface ThemeOption {
+  id: AppTheme;
+  name: string;
+  nativeNames: Record<SupportedLanguage, string>;
+  description: string;
+  tagline: string;
+  primaryColor: string;
+  accentColor: string;
+  canvasColor: string;
+  badgeColor: string;
+  isDark?: boolean;
+  category: 'natural' | 'clinical' | 'earth' | 'night' | 'field' | 'wellness';
+}
+
 export type FacilityTierType = 'sub_centre' | 'phc' | 'rural_hospital' | 'district_hospital';
 
 export type ReferralStatus = 'pending' | 'in_transit' | 'completed' | 'lost' | 'rejected';
@@ -181,7 +197,7 @@ export interface Encounter {
   facility_id: string;
   facility_name: string;
   facility_tier: FacilityTierType;
-  encounter_type: 'asha_home_visit' | 'sub_centre_checkup' | 'phc_opd' | 'specialist_teleconsult' | 'hospital_admission';
+  encounter_type: 'asha_home_visit' | 'sub_centre_checkup' | 'phc_opd' | 'specialist_teleconsult' | 'hospital_admission' | 'patient_self_report';
   vitals: EncounterVitals;
   symptoms: string[];
   diagnosis: string;
@@ -211,12 +227,74 @@ export interface EscalationEvent {
   ambulance_dispatched?: boolean;
 }
 
+export type MedicationTimingSlot = 'morning' | 'afternoon' | 'evening' | 'night' | 'custom';
+
+export type MedicationFrequency = 'daily' | 'twice_daily' | 'thrice_daily' | 'alternate_days' | 'weekly' | 'as_needed';
+
+export type MedicationFoodTiming = 'before_meals' | 'after_meals' | 'with_meals' | 'empty_stomach' | 'anytime';
+
+export interface MedicationAlertSlot {
+  slot: MedicationTimingSlot;
+  time: string; // e.g. "08:00 AM", "01:00 PM", "08:00 PM", "09:30 PM"
+  enabled: boolean;
+}
+
+export interface MedicationReminder {
+  id: string;
+  patient_id: string;
+  patient_name: string;
+  medicine_name: string;
+  dosage: string;
+  timing_slots: MedicationTimingSlot[];
+  alert_times: MedicationAlertSlot[];
+  food_timing: MedicationFoodTiming;
+  instructions?: string;
+  frequency: MedicationFrequency;
+  start_date: string;
+  end_date?: string;
+  is_active: boolean;
+  source: 'doctor_prescription' | 'patient_scheduled' | 'asha_assigned';
+  sms_alerts: boolean;
+  audio_alerts: boolean;
+  created_at: string;
+}
+
+export interface MedicationDoseLog {
+  id: string;
+  reminder_id: string;
+  patient_id: string;
+  patient_name?: string;
+  medicine_name: string;
+  dosage: string;
+  scheduled_date: string; // YYYY-MM-DD
+  slot: MedicationTimingSlot;
+  slot_time: string;
+  food_timing: MedicationFoodTiming;
+  status: 'taken' | 'skipped' | 'pending';
+  taken_at?: string;
+  notes?: string;
+  synced_with_abdm_profile: boolean;
+  logged_by_role: UserRole;
+}
+
+export interface PatientAdherenceSummary {
+  patient_id: string;
+  today_total_doses: number;
+  today_taken_doses: number;
+  today_adherence_percent: number;
+  streak_days: number;
+  seven_day_history: { date: string; day_name: string; total: number; taken: number; percent: number }[];
+  last_sync_timestamp: string;
+  active_reminders_count: number;
+  abha_id?: string;
+}
+
 export interface OfflineSyncQueueItem {
   id: string;
   endpoint: string;
   method: 'POST' | 'PUT' | 'DELETE';
   payload: any;
-  action_type: 'register_patient' | 'create_referral' | 'update_referral_status' | 'log_encounter' | 'resolve_risk_flag' | 'trigger_escalation';
+  action_type: 'register_patient' | 'create_referral' | 'update_referral_status' | 'log_encounter' | 'resolve_risk_flag' | 'trigger_escalation' | 'log_medication_dose' | 'schedule_medication_reminder' | 'sync_medication_profile';
   timestamp: string;
   synced: boolean;
   error?: string;

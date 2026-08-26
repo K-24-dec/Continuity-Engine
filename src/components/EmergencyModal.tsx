@@ -10,14 +10,16 @@ import {
   CheckCircle2,
   Radio
 } from 'lucide-react';
-import { Patient, FacilityTier } from '../types';
+import { Patient, FacilityTier, SupportedLanguage } from '../types';
 import { triggerEmergencyEscalation } from '../services/api';
+import { translations } from '../services/i18n';
 
 interface EmergencyModalProps {
   isOpen: boolean;
   onClose: () => void;
   patients: Patient[];
   facilities: FacilityTier[];
+  currentLang?: SupportedLanguage;
   onEscalated?: () => void;
 }
 
@@ -26,15 +28,20 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
   onClose,
   patients,
   facilities,
+  currentLang = 'en',
   onEscalated
 }) => {
-  const [selectedPatientId, setSelectedPatientId] = useState<string>(patients[0]?.id || '');
+  const t = translations[currentLang] || translations.en;
+  const safePatients = patients || [];
+  const safeFacilities = facilities || [];
+
+  const [selectedPatientId, setSelectedPatientId] = useState<string>(safePatients[0]?.id || '');
   const [customName, setCustomName] = useState('');
   const [village, setVillage] = useState('Dhanora Tribal Zone');
   const [reason, setReason] = useState('Severe Postpartum Haemorrhage / Eclampsia Alert');
   const [priority, setPriority] = useState<'critical' | 'high'>('critical');
   const [selectedFacilityId, setSelectedFacilityId] = useState(
-    facilities.find(f => f.type === 'district_hospital')?.id || facilities[facilities.length - 1]?.id || ''
+    safeFacilities.find(f => f.type === 'district_hospital')?.id || safeFacilities[safeFacilities.length - 1]?.id || ''
   );
   const [symptoms, setSymptoms] = useState<string[]>([
     'Uncontrolled Bleeding',
@@ -102,13 +109,13 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
             </div>
             <div>
               <h2 className="font-bold text-lg leading-tight flex items-center gap-2">
-                EMERGENCY ESCALATION (SOS)
+                {t.emergencySos}
                 <span className="text-[10px] uppercase font-mono tracking-widest bg-black/30 px-2 py-0.5 rounded-md font-bold">
                   Tier Jump Priority #1
                 </span>
               </h2>
               <p className="text-xs text-white/90 mt-0.5">
-                Immediately bypass standard queue, alert receiving facility & dispatch 108 transport
+                {t.sosModalDesc}
               </p>
             </div>
           </div>
@@ -126,7 +133,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
             <div className="w-16 h-16 bg-[#4A5D4E]/20 text-[#4A5D4E] rounded-full flex items-center justify-center mx-auto border-2 border-[#4A5D4E]">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-[#2C332B]">Emergency Broadcast Active</h3>
+            <h3 className="text-xl font-bold text-[#2C332B]">{t.sosBroadcastActive}</h3>
             <p className="text-sm text-[#8C7851]">
               SOS Alert <span className="font-mono font-bold text-[#DC2626]">#{successEvent.id}</span> broadcasted to{' '}
               <span className="font-semibold text-[#2C332B]">{successEvent.escalated_to_facility_name}</span>.
@@ -134,15 +141,15 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
 
             <div className="bg-[#F5F5F0] rounded-2xl p-4 text-left text-xs space-y-2 border border-[#D8D5C3]">
               <div className="flex justify-between">
-                <span className="text-[#8C7851]">Patient:</span>
+                <span className="text-[#8C7851]">{t.patient}:</span>
                 <span className="font-bold text-[#2C332B]">{successEvent.patient_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#8C7851]">Location:</span>
+                <span className="text-[#8C7851]">{t.villageHamlet}:</span>
                 <span className="text-[#2C332B] font-medium">{successEvent.patient_village}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#8C7851]">108 Ambulance Status:</span>
+                <span className="text-[#8C7851]">{t.ambulance108Status}:</span>
                 <span className="text-[#4A5D4E] font-bold flex items-center gap-1">
                   <Ambulance className="w-3.5 h-3.5" /> Dispatched (GPS Tracking Active)
                 </span>
@@ -158,13 +165,13 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
                 href="tel:108"
                 className="flex-1 py-3 px-4 bg-[#4A5D4E] hover:bg-[#3C4C3F] font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-white shadow-xs transition-colors"
               >
-                <PhoneCall className="w-4 h-4" /> Call 108 Dispatch Direct
+                <PhoneCall className="w-4 h-4" /> {t.callHelpline}
               </a>
               <button
                 onClick={onClose}
                 className="py-3 px-5 bg-[#EAE7DC] hover:bg-[#D8D5C3] text-xs font-bold rounded-xl text-[#2C332B] transition-colors"
               >
-                Done
+                {t.close}
               </button>
             </div>
           </div>
@@ -173,7 +180,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
             {/* Patient Selection */}
             <div>
               <label className="block text-[#4A5D4E] font-bold mb-1">
-                Select Patient or Enter Name:
+                {t.selectPatientSos}:
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <select
@@ -186,7 +193,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
                   className="w-full bg-[#F5F5F0] border border-[#D8D5C3] rounded-xl p-2.5 text-[#2C332B] font-medium"
                 >
                   <option value="">-- Unregistered / Emergency Walk-in --</option>
-                  {patients.map(p => (
+                  {safePatients.map(p => (
                     <option key={p.id} value={p.id}>
                       {p.name} ({p.village} • {p.age}y/{p.gender})
                     </option>
@@ -209,7 +216,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
             {/* Destination Facility Tier */}
             <div>
               <label className="block text-[#4A5D4E] font-bold mb-1">
-                Escalate Directly To (Facility Tier Jump):
+                {t.escalateToFacility}:
               </label>
               <select
                 value={selectedFacilityId}
@@ -217,9 +224,9 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
                 aria-label="Select destination facility tier"
                 className="w-full bg-[#F5F5F0] border border-[#D8D5C3] rounded-xl p-2.5 text-[#2C332B] font-medium"
               >
-                {facilities.map(f => (
+                {safeFacilities.map(f => (
                   <option key={f.id} value={f.id}>
-                    [{f.type.replace('_', ' ').toUpperCase()}] {f.name} ({f.district})
+                    [{f.type?.replace('_', ' ').toUpperCase()}] {f.name} ({f.district})
                   </option>
                 ))}
               </select>
@@ -228,7 +235,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
             {/* Red Flag Symptoms */}
             <div>
               <label className="block text-[#4A5D4E] font-bold mb-1.5">
-                Critical Red Flag Symptoms:
+                {t.redFlagSymptoms}:
               </label>
               <div className="flex flex-wrap gap-1.5">
                 {[
@@ -263,7 +270,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
             {/* Vitals Alert */}
             <div>
               <label className="block text-[#4A5D4E] font-bold mb-1">
-                Critical Vitals & Observations:
+                {t.criticalVitalsObs}:
               </label>
               <input
                 type="text"
@@ -284,7 +291,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
                 className="w-4 h-4 rounded text-[#DC2626] focus:ring-[#DC2626] bg-white border-[#D8D5C3]"
               />
               <label htmlFor="dispatch-amb-check" className="text-[#2C332B] cursor-pointer">
-                <span className="font-bold text-[#DC2626]">Auto-Dispatch 108 Emergency Transport</span>
+                <span className="font-bold text-[#DC2626]">{t.autoDispatch108}</span>
                 <p className="text-[11px] text-[#8C7851] mt-0.5">
                   Transmits GPS hamlet coordinates directly to District Ambulance Dispatch.
                 </p>
@@ -298,7 +305,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
                 onClick={onClose}
                 className="px-4 py-2 bg-[#EAE7DC] hover:bg-[#D8D5C3] text-[#2C332B] rounded-xl font-bold transition-colors"
               >
-                Cancel
+                {t.cancel}
               </button>
               <button
                 type="submit"
@@ -306,7 +313,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
                 className="px-5 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl flex items-center space-x-2 shadow-md transition-transform active:scale-95"
               >
                 <Radio className="w-4 h-4 animate-pulse" />
-                <span>{submitting ? 'Broadcasting SOS...' : 'BROADCAST EMERGENCY SOS'}</span>
+                <span>{submitting ? 'Broadcasting SOS...' : t.broadcastEmergencySos}</span>
               </button>
             </div>
           </form>
@@ -315,3 +322,4 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
     </div>
   );
 };
+

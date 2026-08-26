@@ -110,14 +110,14 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Brand & Tagline */}
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-xl bg-[#A3B18A] text-[#2C332B] flex items-center justify-center font-black tracking-wider text-xl shadow-xs">
-            CE
+            AS
           </div>
           <div>
             <div className="flex items-center space-x-2">
               <h1 className="font-bold text-lg leading-tight tracking-tight text-white flex items-center gap-2">
                 {t.appName}
                 <span className="text-[10px] font-bold tracking-widest uppercase bg-[#EAE7DC] text-[#4A5D4E] px-2 py-0.5 rounded-full border border-[#D8D5C3]">
-                  SIH26133
+                  ABDM CONNECTED
                 </span>
               </h1>
             </div>
@@ -160,10 +160,10 @@ export const Header: React.FC<HeaderProps> = ({
                 ? 'bg-[#EAE7DC] text-[#8C7851] border-[#D8D5C3]'
                 : 'bg-[#3C4C3F] text-[#A3B18A] border-[#5A6D5E]'
             }`}
-            title="Simulate going offline to test low-connectivity IndexedDB queue & sync"
+            title="Toggle offline/online mode"
           >
             {offline ? <WifiOff className="w-3.5 h-3.5" /> : <Wifi className="w-3.5 h-3.5 text-[#A3B18A]" />}
-            <span className="hidden sm:inline">{offline ? 'Offline' : 'Online'}</span>
+            <span className="hidden sm:inline">{offline ? t.offlineMode : t.onlineMode}</span>
           </button>
 
           {/* Pending Queue Sync Pill */}
@@ -211,7 +211,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="px-2.5 py-1.5 rounded-xl bg-[#3C4C3F] hover:bg-[#324035] text-[#EAE7DC] border border-[#5A6D5E] text-xs font-semibold transition-colors flex items-center gap-1"
               title="Return to Main Landing & Login Page"
             >
-              <span>Landing Page</span>
+              <span>{t.switchRoleLogout}</span>
             </button>
           )}
 
@@ -221,7 +221,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={handleResetData}
             disabled={resetting}
             className="p-1.5 rounded-xl bg-[#3C4C3F] hover:bg-[#324035] text-[#D8D5C3] border border-[#5A6D5E] transition-colors"
-            title="Reset dataset with unscripted demo data (leaking referrals, overdue high risk flags)"
+            title="Reset dataset with demo data"
           >
             <Database className={`w-3.5 h-3.5 ${resetting ? 'animate-spin' : ''}`} />
           </button>
@@ -232,7 +232,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="bg-[#3C4C3F] border-t border-[#344237] px-3 sm:px-6">
         <div className="max-w-7xl mx-auto flex items-center space-x-1 sm:space-x-3 overflow-x-auto py-2 scrollbar-none">
           <span className="text-[11px] font-bold text-[#A3B18A] uppercase tracking-widest hidden sm:inline mr-2">
-            Facility Tier:
+            {t.facilityTiers}:
           </span>
 
           <button
@@ -247,7 +247,7 @@ export const Header: React.FC<HeaderProps> = ({
             <UserCheck className="w-3.5 h-3.5" />
             <span>{t.rolePatientAsha}</span>
             <span className="text-[10px] bg-[#EAE7DC] px-1.5 py-0.5 rounded text-[#4A5D4E] ml-1 font-bold">
-              Sub-Centre
+              {t.tier1SubCentre}
             </span>
           </button>
 
@@ -263,7 +263,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Stethoscope className="w-3.5 h-3.5" />
             <span>{t.roleDoctor}</span>
             <span className="text-[10px] bg-[#EAE7DC] px-1.5 py-0.5 rounded text-[#4A5D4E] ml-1 font-bold">
-              PHC / CHC
+              {t.tier2Phc}
             </span>
           </button>
 
@@ -279,7 +279,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Shield className="w-3.5 h-3.5" />
             <span>{t.roleAdmin}</span>
             <span className="text-[10px] bg-[#EAE7DC] px-1.5 py-0.5 rounded text-[#4A5D4E] ml-1 font-bold">
-              District HQ
+              {t.tier4District}
             </span>
           </button>
         </div>

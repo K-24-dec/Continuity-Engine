@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, MessageSquare, Send, CheckCheck, RefreshCw, X, Radio, ArrowRight } from 'lucide-react';
-import { SMSMessage } from '../types';
+import { SMSMessage, SupportedLanguage } from '../types';
 import { fetchSmsLogs, simulateUSSD } from '../services/api';
+import { translations } from '../services/i18n';
 
 interface SmsSimulatorModalProps {
   isOpen: boolean;
   onClose: () => void;
+  currentLang?: SupportedLanguage;
 }
 
-export const SmsSimulatorModal: React.FC<SmsSimulatorModalProps> = ({ isOpen, onClose }) => {
+export const SmsSimulatorModal: React.FC<SmsSimulatorModalProps> = ({ isOpen, onClose, currentLang = 'en' }) => {
+  const t = translations[currentLang] || translations.en;
   const [logs, setLogs] = useState<SMSMessage[]>([]);
   const [ussdInput, setUssdInput] = useState('*108*1#');
   const [phone, setPhone] = useState('+91 98765 11001');
@@ -18,7 +21,7 @@ export const SmsSimulatorModal: React.FC<SmsSimulatorModalProps> = ({ isOpen, on
   const loadLogs = async () => {
     try {
       const data = await fetchSmsLogs();
-      setLogs(data);
+      setLogs(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error(e);
     }
@@ -201,7 +204,7 @@ export const SmsSimulatorModal: React.FC<SmsSimulatorModalProps> = ({ isOpen, on
             onClick={onClose}
             className="px-5 py-2 bg-[#4A5D4E] hover:bg-[#3C4C3F] text-white rounded-xl text-xs font-bold shadow-xs transition-colors"
           >
-            Close Simulator
+            {t.close}
           </button>
         </div>
       </div>

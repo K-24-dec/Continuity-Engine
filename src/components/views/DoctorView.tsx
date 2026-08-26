@@ -34,7 +34,8 @@ import {
   createReferral,
   requestAIClinicalSummary,
   fetchPatientHistory,
-  fetchInventory
+  fetchInventory,
+  autoSyncPrescriptionsToReminders
 } from '../../services/api';
 import { translations } from '../../services/i18n';
 
@@ -57,7 +58,11 @@ export const DoctorView: React.FC<DoctorViewProps> = ({
   onOpenTeleconsult,
   onTriggerSOS
 }) => {
-  const [selectedPatientId, setSelectedPatientId] = useState<string>(patients[0]?.id || '');
+  const safePatients = patients || [];
+  const safeFacilities = facilities || [];
+  const safeReferrals = referrals || [];
+
+  const [selectedPatientId, setSelectedPatientId] = useState<string>(safePatients[0]?.id || '');
   const [patientHistory, setPatientHistory] = useState<any>(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
@@ -178,9 +183,14 @@ export const DoctorView: React.FC<DoctorViewProps> = ({
       });
     }
 
-    alert('Clinical encounter and prescriptions successfully logged to ABHA longitudinal record.');
+    if (prescriptions.length > 0) {
+      await autoSyncPrescriptionsToReminders(selectedPatient.id).catch(console.error);
+    }
+
+    alert('Clinical encounter and prescriptions successfully logged to ABHA longitudinal record. Daily medication reminders synchronized.');
     setDiagnosis('');
     setClinicalNotes('');
+    setPrescriptions([]);
     onRefreshData();
   };
 
@@ -218,13 +228,13 @@ export const DoctorView: React.FC<DoctorViewProps> = ({
               {t.doctorQueue}
             </h3>
             <span className="text-[10px] bg-[#EAE7DC] text-[#4A5D4E] font-bold px-2 py-0.5 rounded-full border border-[#D8D5C3]">
-              {patients.length} Active Patients
+              {safePatients.length} Active Patients
             </span>
           </div>
 
           <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-            {patients.map(p => {
-              const activeRef = referrals.find(r => r.patient_id === p.id && r.status !== 'completed');
+            {safePatients.map(p => {
+              const activeRef = safeReferrals.find(r => r.patient_id === p.id && r.status !== 'completed');
               const isSelected = p.id === selectedPatientId;
               return (
                 <div
@@ -257,7 +267,7 @@ export const DoctorView: React.FC<DoctorViewProps> = ({
 
                   {p.chronic_conditions && p.chronic_conditions.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {p.chronic_conditions.map(c => (
+                      {(p.chronic_conditions || []).map(c => (
                         <span key={c} className="text-[9px] bg-[#EAE7DC] text-[#2C332B] px-2 py-0.5 rounded border border-[#D8D5C3]">
                           {c}
                         </span>
@@ -595,9 +605,9 @@ export const DoctorView: React.FC<DoctorViewProps> = ({
                   onChange={(e) => setReferToFacilityId(e.target.value)}
                   className="w-full bg-[#F5F5F0] border border-[#D8D5C3] rounded-xl p-2.5 text-[#2C332B]"
                 >
-                  {facilities.map(f => (
+                  {safeFacilities.map(f => (
                     <option key={f.id} value={f.id}>
-                      [{f.type.toUpperCase()}] {f.name} ({f.district})
+                      [{f.type?.toUpperCase()}] {f.name} ({f.district})
                     </option>
                   ))}
                 </select>

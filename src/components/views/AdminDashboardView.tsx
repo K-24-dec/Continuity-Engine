@@ -77,7 +77,10 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     onRefreshData();
   };
 
-  const leakingReferrals = referrals.filter(r => r.is_leaking || r.status === 'lost');
+  const safeReferrals = referrals || [];
+  const safeFacilities = facilities || [];
+  const safeEscalations = escalations || [];
+  const leakingReferrals = safeReferrals.filter(r => r && (r.is_leaking || r.status === 'lost'));
 
   return (
     <div id="district-admin-dashboard-container" className="space-y-4 text-xs">
@@ -274,7 +277,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             {/* Active Thread Flow Summary */}
             <div className="bg-[#EAE7DC] p-4 rounded-2xl border border-[#D8D5C3] space-y-2">
               <h4 className="font-bold text-xs text-[#4A5D4E]">
-                Why Continuity Engine Solves SIH26133:
+                Why AarogyaSamaj Solves Rural Healthcare Continuity:
               </h4>
               <ul className="list-disc list-inside space-y-1 text-[11px] text-[#2C332B] leading-relaxed">
                 <li><strong>No Telemedicine Silos:</strong> Teleconsult is an assisted bridge between ASHA and Medical Officer, not an ungrounded consumer gimmick.</li>
@@ -369,9 +372,9 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F5F5F0]">
-                {referrals.map(ref => {
-                  const fromFac = facilities.find(f => f.id === ref.from_facility_id);
-                  const toFac = facilities.find(f => f.id === ref.to_facility_id);
+                {safeReferrals.map(ref => {
+                  const fromFac = safeFacilities.find(f => f.id === ref.from_facility_id);
+                  const toFac = safeFacilities.find(f => f.id === ref.to_facility_id);
                   const isLost = ref.is_leaking || ref.status === 'lost';
 
                   return (
@@ -428,7 +431,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       {/* TAB 3: FACILITY NETWORK HIERARCHY */}
       {activeTab === 'facilities' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {facilities.map(fac => (
+          {safeFacilities.map(fac => (
             <div
               key={fac.id}
               className="bg-white border border-[#D8D5C3] rounded-2xl p-4 shadow-xs space-y-3"
@@ -436,7 +439,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               <div className="flex justify-between items-start">
                 <div>
                   <span className="text-[10px] font-bold uppercase bg-[#EAE7DC] text-[#4A5D4E] px-2 py-0.5 rounded-full border border-[#D8D5C3]">
-                    {fac.type.replace('_', ' ')}
+                    {fac.type?.replace('_', ' ')}
                   </span>
                   <h4 className="font-bold text-sm text-[#2C332B] mt-1.5">
                     {fac.name}
@@ -450,12 +453,12 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               <div className="space-y-1 text-[11px] text-[#2C332B] bg-[#F5F5F0] p-2.5 rounded-xl border border-[#D8D5C3]">
                 <div className="flex justify-between">
                   <span className="text-[#8C7851]">Available Beds:</span>
-                  <strong className="text-[#2C332B]">{fac.capacity_beds}</strong>
+                  <strong className="text-[#2C332B]">{fac.bed_count ?? (fac as any).capacity_beds ?? 0}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#8C7851]">Medical Staff:</span>
                   <strong className="text-[#2C332B]">
-                    {fac.staff_count?.doctors || 0} MOs, {fac.staff_count?.nurses || 0} Nurses
+                    {fac.doctor_count ?? (fac as any).staff_count?.doctors ?? 0} MOs
                   </strong>
                 </div>
                 <div className="flex justify-between">
@@ -469,7 +472,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                   Services Offered:
                 </span>
                 <div className="flex flex-wrap gap-1">
-                  {fac.services_offered.map(s => (
+                  {(fac.specialties || (fac as any).services_offered || []).map((s: string) => (
                     <span key={s} className="text-[10px] bg-[#EAE7DC] text-[#4A5D4E] px-2 py-0.5 rounded border border-[#D8D5C3]">
                       {s}
                     </span>
@@ -498,10 +501,10 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
 
           <div className="space-y-3">
-            {escalations.length === 0 ? (
+            {safeEscalations.length === 0 ? (
               <p className="text-[#8C7851] italic">No emergency escalations active right now.</p>
             ) : (
-              escalations.map(esc => (
+              safeEscalations.map(esc => (
                 <div
                   key={esc.id}
                   className="p-4 bg-rose-50/50 border border-rose-200 rounded-2xl space-y-2"
@@ -559,7 +562,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               DPDP Act 2023 & ABDM FHIR Consent Architecture
             </h3>
             <p className="text-xs text-[#8C7851] mt-1">
-              Technical compliance parameters built directly into the Continuity Engine data pipelines.
+              Technical compliance parameters built directly into the AarogyaSamaj data pipelines.
             </p>
           </div>
 
